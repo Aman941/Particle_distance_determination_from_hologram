@@ -42,9 +42,9 @@ axis off
 % creating maps for further computation
 sz = size(I);
 intensity_map = zeros(sz);
-intensity_dist_map = zeros(sz);
+intensity_dist = zeros(sz);
 tenen_map = zeros(sz);
-tenen_dist_map = zeros(sz);
+tenen_dist = zeros(sz);
 
 [rows , cols] = size(I);
 
@@ -56,7 +56,7 @@ for col = 1:cols
 end
 
 % initializing no. of frames to work upon
-frame_no = 500;
+frame_no = 100;
 dist_frames = zeros(rows,cols,frame_no);
 
 for n = 1:frame_no;
@@ -79,11 +79,11 @@ for n = 1:frame_no;
         for row = 1:rows
             if(intensity_map(row,col) > intensity_img(row,col))
                 intensity_map(row,col) = intensity_img(row,col);
-                intensity_dist_map(row,col) = (0.9*z+(0.2*z/frame_no)*n);
+                intensity_dist(row,col) = (0.9*z+(0.2*z/frame_no)*n);
             end
             if(tenen_map(row,col) < tenen_img(row,col))
                 tenen_map(row,col) = tenen_img(row,col);
-                tenen_dist_map(row,col) = (0.9*z+(0.2*z/frame_no)*n);
+                tenen_dist(row,col) = (0.9*z+(0.2*z/frame_no)*n);
             end
         end
     end
@@ -105,11 +105,11 @@ for col = 1:cols
     for row = 1:rows
         if(intensity_map(row,col) < intensity_thresh)
             counter = counter +1;
-            dist_sum = dist_sum + intensity_dist_map(row,col);
+            dist_sum = dist_sum + intensity_dist(row,col);
         end
     end
 end
-intensity_dist = dist_sum/counter;
+dist = dist_sum/counter;
 
 % calculating distance using tenen_map (Method-2)
 tenen_counter = 0;
@@ -118,7 +118,7 @@ for col = 1:cols
     for row = 1:rows
         if(tenen_map(row,col) > tenen_thresh)
             tenen_counter = tenen_counter +1;
-            tenen_dist_sum = tenen_dist_sum + tenen_dist_map(row,col);
+            tenen_dist_sum = tenen_dist_sum + tenen_dist(row,col);
         end
     end
 end
@@ -137,7 +137,7 @@ for col = 1:cols
     end
 end
 
-intensity_map = imdilate(intensity_map,ones(8));
+intensity_map = imdilate(intensity_map,ones(5));
 
 figure 
 imshow(intensity_map);
@@ -145,21 +145,5 @@ imshow(intensity_map);
 % Creating hybrid_map
 
 hybrid_map = intensity_map.*tenen_map;
-hybrid_counter = 0;
-hybrid_dist_sum = 0;
-hybrid_thresh = 0.7;
 
 
-for col = 1:cols
-    for row = 1:rows
-        if(hybrid_map(row,col) > hybrid_thresh)
-            hybrid_counter = hybrid_counter + 1;
-            hybrid_dist_sum = hybrid_dist_sum + tenen_dist_map(row,col);
-        end 
-    end
-end
-
-hybrid_dist = (hybrid_dist_sum/hybrid_counter);
-
-figure
-imshow(hybrid_map);
