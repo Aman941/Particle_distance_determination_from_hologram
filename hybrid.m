@@ -1,5 +1,5 @@
 clear all; close all;
-I=imread('img3.bmp','bmp'); % 256256 pixels, 8bit image
+I=imread('img4.bmp','bmp'); % 256256 pixels, 8bit image
 I=double(I);
 I = medfilt2(I);
 
@@ -56,7 +56,7 @@ for col = 1:cols
 end
 
 % initializing no. of frames to work upon
-frame_no = 500;
+frame_no = 1000;
 dist_frames = zeros(rows,cols,frame_no);
 
 for n = 1:frame_no;
