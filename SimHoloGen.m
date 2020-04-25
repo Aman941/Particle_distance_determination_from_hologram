@@ -25,6 +25,7 @@ figure; imagesc(object); colormap gray;
 z1 = 0.01;
 prop = Propagator1(N, lambda, area, z1);
 U = ifft2(ifftshift(fftshift(fft2(object)).*prop));
+
 object = ones(N,N);
 xc = -1+2*1*rand(nP,1); 
 yc = -1+2*1*rand(nP,1);

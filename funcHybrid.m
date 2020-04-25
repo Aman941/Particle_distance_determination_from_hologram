@@ -1,4 +1,4 @@
-function [iMap,tenMap,hybMap,iDis,tenDis,hybDis,tenDisMap] = funcHybrid(dist_frames,zStart,zEnd)
+function [iMap,tenMap,hybMap,iDis,tenDis,hybDis,tenDisMap,iDisMap] = funcHybrid(dist_frames,zStart,zEnd)
 dist_frames = mat2gray(dist_frames);
 [rows,cols,nF] = size(dist_frames);
 zVec = linspace(zStart,zEnd,nF);
@@ -27,6 +27,12 @@ end
 %     tenen_img(:,:,n) = sobel(dist_frames(:,:,n));
 % end
 % [tenMap,tenDisMap] = max(tenen_img,[],3);
+tenenMaxVal = max(tenMap);
+% find required threshold for each particle
+
+
+
+
 
 % applying threshold
 intensity_thresh = 0.2;
@@ -66,12 +72,12 @@ for col = 1:cols
         end
     end
 end
-iMap = imdilate(iMap,ones(8));
+%iMap = imdilate(iMap,ones(1));
 % Creating hybMap
 hybMap = iMap.*tenMap;
 hybrid_counter = 0;
 hybDis_sum = 0;
-hybrid_thresh = 0.7;
+hybrid_thresh = 0.8;
 for col = 1:cols
     for row = 1:rows
         if(hybMap(row,col) > hybrid_thresh)

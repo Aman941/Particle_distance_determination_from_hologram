@@ -7,7 +7,7 @@ N = 256;                   % number of pixels
 lambda = 500*10^(-9);      % wavelength in meter
 area = 0.002;              % area size in meter
 z_start = 0.06;            % z start in meter
-z_end = 0.09;              % z end in meter
+z_end = 0.1;              % z end in meter
 z_step = 0.001;            % z step in meter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % READING HOLOGRAM OBJECT
@@ -27,8 +27,14 @@ prop = Propagator1(N, lambda, area, z);
 recO = (ifft2(ifftshift(fftshift(fft2(hologramO)).*prop)));
 reconObj(:,:,ii) = abs(recO);
 end
-[iMap,tenMap,hybMap,iDis,tenDis,hybDis,tenDisMap] = funcHybrid(reconObj,z_start,z_end);
+[iMap,tenMap,hybMap,iDis,tenDis,hybDis,tenDisMap,iDisMap] = funcHybrid(reconObj,z_start,z_end);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure;
+imshow(iMap);
+figure
+imshow(tenMap);
+figure;
+imshow(hybMap);
 % little tweaking hybMap
 
 threshold = graythresh(hybMap);
@@ -36,8 +42,8 @@ hybMap_bw = im2bw(hybMap,threshold);
 
 hold on
 [B,L] = bwboundaries(hybMap_bw,'noholes');
-imshow(label2rgb(L, @jet, [.5 .5 .5]))
-figure
+%imshow(label2rgb(L, @jet, [.5 .5 .5]))
+%figure
 imshow(hybMap_bw);
 hold on
 for k = 1:length(B)
@@ -49,7 +55,8 @@ centroids = regionprops(hybMap_bw,'centroid');
 % obtaining 2d size of particles
 Areas = regionprops(hybMap_bw,'Area');
 % distance of particles in 3d
-partiDist = zeros(length(B),1);
+partiDist = zeros(length(B),1); % it will contain distances of different particles
+tenDisMap = tenDisMap.*hybMap_bw;
 for k = 1:length(B)
    boundary = B{k};
    col1 = boundary(:,1);
@@ -62,7 +69,9 @@ for k = 1:length(B)
    for r = r1:r2
        for c = c1:c2
            partiDist(k,1) = partiDist(k,1)+tenDisMap(r,c);
-           counter = counter+1;
+           if(tenDisMap(r,c) ~= 0)
+               counter = counter+1;
+           end 
        end
    end
    partiDist(k,1) = partiDist(k,1)/counter;
